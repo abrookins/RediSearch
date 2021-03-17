@@ -51,7 +51,7 @@ def testBasicGCWithEmptyInvIdx(env):
 
     env.assertEqual(env.cmd('ft.del', 'idx', 'doc1'), 1)
 
-    for _ in range (10):
+    for _ in range (100):
         env.cmd('ft.debug', 'GC_FORCEINVOKE', 'idx')
 
     # check that the gc collected the deleted docs
