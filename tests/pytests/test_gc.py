@@ -51,7 +51,8 @@ def testBasicGCWithEmptyInvIdx(env):
 
     env.assertEqual(env.cmd('ft.del', 'idx', 'doc1'), 1)
 
-    env.cmd('ft.debug', 'GC_FORCEINVOKE', 'idx')
+    for _ in range (10):
+        env.cmd('ft.debug', 'GC_FORCEINVOKE', 'idx')
 
     # check that the gc collected the deleted docs
     env.expect('ft.debug', 'DUMP_INVIDX', 'idx', 'world').error().contains('Can not find the inverted index')
