@@ -71,6 +71,7 @@ static int AddDocumentCtx_SetDocument(RSAddDocumentCtx *aCtx, IndexSpec *sp) {
     const FieldSpec *fs = IndexSpec_GetField(sp, f->name, strlen(f->name));
     if (!fs || !f->text) {
       aCtx->fspecs[i].name = NULL;
+      aCtx->fspecs[i].path = NULL;
       aCtx->fspecs[i].types = 0;
       continue;
     }
@@ -313,7 +314,8 @@ void AddDocumentCtx_Submit(RSAddDocumentCtx *aCtx, RedisSearchCtx *sctx, uint32_
   size_t totalSize = 0;
   for (size_t ii = 0; ii < aCtx->doc->numFields; ++ii) {
     const DocumentField *ff = aCtx->doc->fields + ii;
-    if (aCtx->fspecs[ii].name && (ff->indexAs & (INDEXFLD_T_FULLTEXT | INDEXFLD_T_TAG))) {
+    // TOremove:always exist
+    if (ff->indexAs & (INDEXFLD_T_FULLTEXT | INDEXFLD_T_TAG)) {
       size_t n;
       RedisModule_StringPtrLen(aCtx->doc->fields[ii].text, &n);
       totalSize += n;
@@ -568,11 +570,6 @@ int Document_AddToIndexes(RSAddDocumentCtx *aCtx) {
     const FieldSpec *fs = aCtx->fspecs + i;
     const DocumentField *ff = doc->fields + i;
     FieldIndexerData *fdata = aCtx->fdatas + i;
-
-    if (fs->name == NULL || ff->indexAs == 0) {
-      LG_DEBUG("Skipping field %s not in index!", doc->fields[i].name);
-      continue;
-    }
 
     for (size_t ii = 0; ii < INDEXFLD_NUM_TYPES; ++ii) {
       if (!FIELD_CHKIDX(ff->indexAs, INDEXTYPE_FROM_POS(ii))) {
